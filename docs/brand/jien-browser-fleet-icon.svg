@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" fill="none" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Jien Browser Fleet icon</title>
+  <desc id="desc">A shielded browser window with a J-shaped fleet route.</desc>
+  <rect width="256" height="256" rx="56" fill="#176b5b"/>
+  <path fill="#d9f4e8" d="M128 34 54 62v58c0 49 30 82 74 102 44-20 74-53 74-102V62z"/>
+  <path fill="#121820" d="M128 48 68 70v49c0 39 23 67 60 85 37-18 60-46 60-85V70z"/>
+  <rect width="102" height="74" x="77" y="82" fill="#f8fafc" rx="16"/>
+  <path fill="#dbe5ee" d="M77 100c0-10 8-18 18-18h66c10 0 18 8 18 18v9H77z"/>
+  <circle cx="97" cy="96" r="4" fill="#176b5b"/>
+  <circle cx="110" cy="96" r="4" fill="#59d6b0"/>
+  <path stroke="#121820" stroke-linecap="round" stroke-linejoin="round" stroke-width="13" d="M139 116v23c0 16-10 27-27 27"/>
+  <path stroke="#59d6b0" stroke-linecap="round" stroke-linejoin="round" stroke-width="11" d="M98 135c18-19 43-19 60 0"/>
+  <circle cx="98" cy="135" r="9" fill="#59d6b0" stroke="#f8fafc" stroke-width="5"/>
+  <circle cx="158" cy="135" r="9" fill="#59d6b0" stroke="#f8fafc" stroke-width="5"/>
+</svg>

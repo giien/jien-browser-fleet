@@ -1,0 +1,11 @@
+fastapi>=0.115,<0.120
+uvicorn[standard]>=0.32,<0.40
+python-multipart>=0.0.9
+pydantic>=2.8,<3
+pyyaml>=6
+psutil>=6
+requests>=2.32
+PySocks>=1.7
+camoufox[geoip]>=0.4
+browserforge>=1.2
+playwright>=1.48

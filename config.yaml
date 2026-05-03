@@ -1,0 +1,11 @@
+host: 127.0.0.1
+port: 8138
+data_root: data/profiles
+screenshots_root: data/screenshots
+state_file: data/state.json
+logs_root: logs
+max_concurrent_launches: 4
+camoufox_macos_app: "~/Library/Caches/camoufox/Camoufox.app"
+default_start_url: "https://ipwho.is/"
+command_timeout_seconds: 45
+log_level: INFO

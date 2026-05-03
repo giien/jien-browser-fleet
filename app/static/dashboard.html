@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>极恩跨境指纹浏览器 · 电商运营台</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #18222b;
+      --muted: #687782;
+      --page: #f4f6f7;
+      --panel: #ffffff;
+      --line: #dce4e8;
+      --soft: #eef3f5;
+      --accent: #0f766e;
+      --blue: #2563eb;
+      --ok: #178043;
+      --warn: #b7791f;
+      --risk: #c24133;
+      --violet: #6d5bd0;
+      --shadow: 0 16px 44px rgba(24, 34, 43, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--page);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+    button, input, select, textarea {
+      font: inherit;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+    button, select, input { min-height: 34px; }
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 11px;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: border-color .12s ease, transform .12s ease, background .12s ease, opacity .12s ease;
+    }
+    button:hover:not(:disabled) { border-color: #aebcc3; transform: translateY(-1px); }
+    button:disabled { opacity: .45; cursor: default; }
+    button.primary { color: #fff; background: var(--accent); border-color: var(--accent); }
+    button.blue { color: #fff; background: var(--blue); border-color: var(--blue); }
+    button.violet { color: #fff; background: var(--violet); border-color: var(--violet); }
+    button.danger { color: var(--risk); border-color: #efb8b1; }
+    button.ghost { background: transparent; }
+    input, select { padding: 0 10px; }
+    textarea { min-height: 70px; padding: 9px 10px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37, 99, 235, .14); }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 224px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 18px 14px;
+      background: #fff;
+      border-right: 1px solid var(--line);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 4px 18px;
+    }
+    .mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--blue));
+      font-weight: 800;
+    }
+    h1 { margin: 0; font-size: 16px; line-height: 1.2; }
+    .brand small { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .nav-title {
+      margin: 16px 6px 7px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .nav button {
+      width: 100%;
+      justify-content: flex-start;
+      border: 0;
+      background: transparent;
+      margin-bottom: 3px;
+      color: #30414c;
+    }
+    .nav button.active { background: #e9f4f2; color: #0a615a; }
+    .content {
+      min-width: 0;
+      padding: 16px 20px 34px;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 8;
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      margin: -16px -20px 16px;
+      padding: 14px 20px;
+      background: rgba(244, 246, 247, .9);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .top-title { font-weight: 800; font-size: 18px; }
+    .subhead { margin-top: 3px; color: var(--muted); font-size: 12px; }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .search { width: min(360px, 30vw); }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(130px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .stat, .panel, .table-shell {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .stat { padding: 12px; }
+    .stat b { display: block; font-size: 25px; line-height: 1; margin-bottom: 5px; }
+    .stat span, .muted { color: var(--muted); font-size: 12px; }
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .filters, .batchbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .batchbar {
+      justify-content: flex-end;
+      padding: 8px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .batchbar strong { font-size: 13px; }
+    .table-shell { overflow: hidden; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 13px;
+    }
+    thead {
+      background: #f9fbfb;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    th, td {
+      padding: 10px 9px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+    }
+    tbody tr { background: #fff; }
+    tbody tr:hover { background: #fbfdfd; }
+    tbody tr.active { background: #f3faf8; box-shadow: inset 3px 0 0 var(--accent); }
+    th:nth-child(1), td:nth-child(1) { width: 42px; }
+    th:nth-child(2), td:nth-child(2) { width: 250px; }
+    th:nth-child(3), td:nth-child(3) { width: 142px; }
+    th:nth-child(4), td:nth-child(4) { width: 138px; }
+    th:nth-child(5), td:nth-child(5) { width: 128px; }
+    th:nth-child(6), td:nth-child(6) { width: 120px; }
+    th:nth-child(7), td:nth-child(7) { width: 150px; }
+    th:nth-child(8), td:nth-child(8) { width: 268px; }
+    .store-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .dot {
+      width: 9px;
+      height: 9px;
+      flex: 0 0 9px;
+      border-radius: 99px;
+      background: #94a3ad;
+    }
+    .dot.running { background: var(--ok); box-shadow: 0 0 0 4px rgba(23, 128, 67, .12); }
+    .dot.error { background: var(--risk); }
+    .name { min-width: 0; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .id { margin-top: 3px; color: var(--muted); font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      max-width: 100%;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: #344852;
+      font-size: 11px;
+      line-height: 1.3;
+      vertical-align: middle;
+    }
+    .pill.good { background: #e6f5ec; color: #0f6f37; }
+    .pill.warn { background: #fff5da; color: #875100; }
+    .pill.risk { background: #ffebe8; color: #a83228; }
+    .pill.platform { background: #eef1ff; color: #4b3db5; }
+    .task-strip {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .task-strip button {
+      min-height: 28px;
+      padding: 0 8px;
+      font-size: 12px;
+    }
+    .row-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 5px;
+      margin-top: 7px;
+    }
+    .row-actions button { min-height: 28px; padding: 0 6px; font-size: 12px; }
+    .url-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 5px;
+      margin-top: 7px;
+    }
+    .url-row input { min-height: 30px; font-size: 12px; }
+    .url-row button { min-height: 30px; }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 12px;
+      align-items: start;
+    }
+    .side {
+      position: sticky;
+      top: 82px;
+      display: grid;
+      gap: 12px;
+    }
+    .panel { padding: 12px; }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .panel h2 { margin: 0; font-size: 14px; }
+    .editor {
+      display: grid;
+      gap: 8px;
+    }
+    .editor label { display: grid; gap: 4px; color: var(--muted); font-size: 12px; }
+    .editor .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    pre {
+      margin: 0;
+      max-height: 330px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      padding: 10px;
+      background: #f8fafb;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: #26343c;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .event {
+      padding: 8px 0;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .event:first-child { border-top: 0; }
+    .event small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .empty { padding: 24px; text-align: center; color: var(--muted); background: #fff; }
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 30;
+      display: grid;
+      gap: 8px;
+      width: min(380px, calc(100vw - 36px));
+    }
+    .toast-item {
+      padding: 10px 12px;
+      background: #172026;
+      color: #fff;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      font-size: 13px;
+    }
+    .toast-item.error { background: var(--risk); }
+    @media (max-width: 1220px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      .nav { display: flex; flex-wrap: wrap; gap: 6px; }
+      .nav button { width: auto; }
+      .topbar { grid-template-columns: 1fr; }
+      .top-actions { justify-content: flex-start; }
+      .search { width: min(100%, 420px); }
+      .layout { grid-template-columns: 1fr; }
+      .side { position: static; }
+    }
+    @media (max-width: 760px) {
+      .content { padding: 12px; }
+      .topbar { margin: -12px -12px 12px; padding: 12px; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .toolbar { grid-template-columns: 1fr; }
+      .batchbar { justify-content: flex-start; }
+      .table-shell { overflow-x: auto; }
+      table { min-width: 1180px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="mark">极</div>
+        <div>
+          <h1>极恩跨境指纹浏览器</h1>
+          <small>跨境电商运营台</small>
+        </div>
+      </div>
+      <div class="nav-title">工作区</div>
+      <div class="nav">
+        <button class="active">店铺档案</button>
+        <button>代理健康</button>
+        <button>任务模板</button>
+        <button>操作日志</button>
+      </div>
+      <div class="nav-title">快捷任务</div>
+      <div class="nav" id="quickTasks"></div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <div class="top-title">极恩跨境指纹浏览器</div>
+          <div class="subhead" id="lastUpdated">等待同步</div>
+        </div>
+        <div class="top-actions">
+          <input class="search" id="searchInput" placeholder="搜索店铺、品牌、平台、标签、代理或 ID">
+          <input class="search" id="fleetPathInput" value="/Volumes/Rtl9210/camoufox-fleet-local" placeholder="Camoufox 项目目录">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);white-space:nowrap;">
+            <input type="checkbox" id="overwriteBrowserData">
+            覆盖环境
+          </label>
+          <button class="primary" id="importFleetBtn">导入 Camoufox DB</button>
+          <button id="exportBtn">导出数据</button>
+          <button id="refreshBtn">刷新</button>
+          <button class="ghost" id="autoBtn" aria-pressed="true">自动刷新</button>
+        </div>
+      </header>
+
+      <section class="stats">
+        <div class="stat"><b id="profilesTotal">0</b><span>店铺档案</span></div>
+        <div class="stat"><b id="profilesRunning">0</b><span>运行中</span></div>
+        <div class="stat"><b id="warnTotal">0</b><span>需关注</span></div>
+        <div class="stat"><b id="riskTotal">0</b><span>高风险</span></div>
+        <div class="stat"><b id="maxLaunches">0</b><span>并发上限</span></div>
+      </section>
+
+      <section class="toolbar">
+        <div class="filters">
+          <select id="statusFilter">
+            <option value="all">全部状态</option>
+            <option value="running">运行中</option>
+            <option value="stopped">已停止</option>
+          </select>
+          <select id="platformFilter"><option value="all">全部平台</option></select>
+          <select id="marketFilter"><option value="all">全部市场</option></select>
+          <select id="healthFilter">
+            <option value="all">全部健康</option>
+            <option value="good">健康</option>
+            <option value="warn">需关注</option>
+            <option value="risk">高风险</option>
+          </select>
+          <span class="muted" id="visibleCount">0 / 0</span>
+        </div>
+        <div class="batchbar">
+          <strong id="selectedCount">已选 0</strong>
+          <button class="blue" data-batch="launch">批量启动</button>
+          <button data-batch="proxy">批量检测</button>
+          <button class="danger" data-batch="stop">批量停止</button>
+        </div>
+      </section>
+
+      <section class="layout">
+        <div class="table-shell">
+          <table>
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="selectAll" aria-label="select all"></th>
+                <th>店铺 / 账号</th>
+                <th>平台</th>
+                <th>市场 / 负责人</th>
+                <th>运行</th>
+                <th>健康</th>
+                <th>代理</th>
+                <th>任务 / 操作</th>
+              </tr>
+            </thead>
+            <tbody id="profileRows"></tbody>
+          </table>
+        </div>
+
+        <aside class="side">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>运营字段</h2>
+              <button class="ghost" id="saveCommerceBtn">保存</button>
+            </div>
+            <div class="editor" id="commerceEditor">
+              <div class="muted">选择一行后编辑店铺运营字段。</div>
+            </div>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <h2 id="outputTitle">操作结果</h2>
+              <button class="ghost" id="clearOutput">清空</button>
+            </div>
+            <pre id="outputBox">任务结果、代理检测和日志会显示在这里。</pre>
+          </section>
+          <section class="panel">
+            <h2>最近事件</h2>
+            <div id="events"></div>
+          </section>
+        </aside>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const state = {
+      profiles: [],
+      events: [],
+      tasks: [],
+      selected: new Set(),
+      activeProfileId: "",
+      query: "",
+      status: "all",
+      platform: "all",
+      market: "all",
+      health: "all",
+      busy: new Set(),
+      auto: true,
+      inputFocused: false,
+    };
+
+    const platformLabels = {
+      tiktok_shop: "TikTok Shop",
+      amazon: "Amazon",
+      shopify: "Shopify",
+      etsy: "Etsy",
+      ebay: "eBay",
+      social: "Social",
+      utility: "工具",
+    };
+    const accountLabels = {
+      normal: "正常",
+      warmup: "养号中",
+      verify: "待验证",
+      risk: "风控",
+      disabled: "停用",
+    };
+
+    async function api(path, options = {}) {
+      const res = await fetch(path, { headers: { "Content-Type": "application/json" }, ...options });
+      const text = await res.text();
+      let data;
+      try { data = text ? JSON.parse(text) : {}; } catch { data = text; }
+      if (!res.ok) throw new Error(typeof data === "string" ? data : JSON.stringify(data));
+      return data;
+    }
+
+    function profileTasks(profile) {
+      const platform = profile.commerce?.platform || "social";
+      const exact = state.tasks.find((group) => group.platform === platform)?.tasks || [];
+      const utility = state.tasks.find((group) => group.platform === "utility")?.tasks || [];
+      return [...exact.slice(0, 4), ...utility.slice(0, 1)];
+    }
+
+    function filteredProfiles() {
+      const query = state.query.trim().toLowerCase();
+      return state.profiles.filter((profile) => {
+        const commerce = profile.commerce || {};
+        const health = profile.health || {};
+        if (state.status !== "all" && profile.status !== state.status) return false;
+        if (state.platform !== "all" && commerce.platform !== state.platform) return false;
+        if (state.market !== "all" && commerce.market !== state.market) return false;
+        if (state.health !== "all" && health.level !== state.health) return false;
+        if (!query) return true;
+        const haystack = [
+          profile.name,
+          profile.id,
+          commerce.brand,
+          commerce.platform,
+          commerce.market,
+          commerce.owner,
+          commerce.account_status,
+          proxyLabel(profile),
+          ...(profile.tags || []),
+        ].join(" ").toLowerCase();
+        return haystack.includes(query);
+      });
+    }
+
+    function renderAll() {
+      renderStats();
+      renderFilters();
+      renderQuickTasks();
+      renderRows();
+      renderEditor();
+      renderEvents();
+    }
+
+    function renderStats() {
+      const running = state.profiles.filter((profile) => profile.status === "running").length;
+      const warn = state.profiles.filter((profile) => profile.health?.level === "warn").length;
+      const risk = state.profiles.filter((profile) => profile.health?.level === "risk").length;
+      $("profilesTotal").textContent = state.profiles.length;
+      $("profilesRunning").textContent = running;
+      $("warnTotal").textContent = warn;
+      $("riskTotal").textContent = risk;
+    }
+
+    function renderFilters() {
+      fillSelect("platformFilter", "全部平台", unique(state.profiles.map((p) => p.commerce?.platform)).map((value) => [value, platformName(value)]), state.platform);
+      fillSelect("marketFilter", "全部市场", unique(state.profiles.map((p) => p.commerce?.market)).map((value) => [value, value]), state.market);
+    }
+
+    function renderQuickTasks() {
+      const utility = state.tasks.find((group) => group.platform === "utility")?.tasks || [];
+      $("quickTasks").innerHTML = utility.map((task) => `<button data-quick-task="${escapeAttr(task.id)}">${escapeHtml(task.label)}</button>`).join("");
+    }
+
+    function renderRows() {
+      const rows = filteredProfiles();
+      $("visibleCount").textContent = `${rows.length} / ${state.profiles.length}`;
+      $("selectedCount").textContent = `已选 ${state.selected.size}`;
+      $("selectAll").checked = rows.length > 0 && rows.every((profile) => state.selected.has(profile.id));
+      $("profileRows").innerHTML = rows.length ? rows.map(renderRow).join("") : `<tr><td colspan="8" class="empty">没有匹配的店铺档案</td></tr>`;
+    }
+
+    function renderRow(profile) {
+      const commerce = profile.commerce || {};
+      const health = profile.health || {};
+      const running = profile.status === "running";
+      const selected = state.selected.has(profile.id);
+      const active = state.activeProfileId === profile.id;
+      const busy = state.busy.has(profile.id);
+      const tasks = profileTasks(profile).map((task) => `<button data-action="task" data-task-id="${escapeAttr(task.id)}">${escapeHtml(task.label)}</button>`).join("");
+      return `
+        <tr data-id="${escapeAttr(profile.id)}" class="${active ? "active" : ""}" style="${busy ? "opacity:.62;pointer-events:none" : ""}">
+          <td><input type="checkbox" data-role="select" ${selected ? "checked" : ""} aria-label="select profile"></td>
+          <td>
+            <div class="store-name">
+              <span class="dot ${escapeHtml(profile.status || "stopped")}"></span>
+              <div style="min-width:0">
+                <div class="name" title="${escapeAttr(profile.name)}">${escapeHtml(profile.name)}</div>
+                <div class="id">${escapeHtml(profile.id)}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="pill platform">${escapeHtml(platformName(commerce.platform))}</span>
+            <div class="muted" style="margin-top:5px">${escapeHtml(commerce.brand || "-")}</div>
+          </td>
+          <td>
+            <strong>${escapeHtml(commerce.market || "-")}</strong>
+            <div class="muted">${escapeHtml(commerce.owner || "未分配")}</div>
+            <div class="pill ${commerce.account_status === "risk" ? "risk" : commerce.account_status === "verify" ? "warn" : "good"}">${escapeHtml(accountLabels[commerce.account_status] || commerce.account_status || "正常")}</div>
+          </td>
+          <td>
+            <strong>${escapeHtml(profile.status || "stopped")}</strong>
+            <div class="muted">PID ${profile.process_pid || "-"}</div>
+            <div class="muted">启动 ${profile.launch_count || 0} 次</div>
+          </td>
+          <td>
+            <span class="pill ${escapeHtml(health.level || "warn")}">${health.score ?? 0} / 100</span>
+            <div class="muted" title="${escapeAttr((health.risks || []).join(" / "))}">${escapeHtml((health.risks || [])[0] || "状态正常")}</div>
+          </td>
+          <td>
+            <div title="${escapeAttr(proxyLabel(profile))}">${escapeHtml(proxyLabel(profile))}</div>
+            <div class="muted">${escapeHtml(health.proxy_ip || "-")} ${escapeHtml(health.proxy_country || "")}</div>
+          </td>
+          <td>
+            <div class="task-strip">${tasks}</div>
+            <div class="row-actions">
+              <button class="blue" data-action="launch" ${running ? "disabled" : ""}>启动</button>
+              <button class="danger" data-action="stop" ${running ? "" : "disabled"}>停止</button>
+              <button data-action="proxy">检测</button>
+              <button data-action="pages" ${running ? "" : "disabled"}>页面</button>
+              <button data-action="shot" ${running ? "" : "disabled"}>截图</button>
+              <button data-action="logs">日志</button>
+            </div>
+            <div class="url-row">
+              <input data-role="url" value="${escapeAttr(profile.start_url || "https://ipwho.is/")}" aria-label="start url">
+              <button data-action="go" ${running ? "" : "disabled"}>访问</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function renderEditor() {
+      const profile = state.profiles.find((item) => item.id === state.activeProfileId);
+      if (!profile) {
+        $("commerceEditor").innerHTML = `<div class="muted">选择一行后编辑店铺运营字段。</div>`;
+        return;
+      }
+      const commerce = profile.commerce || {};
+      $("commerceEditor").innerHTML = `
+        <label>店铺 / 档案名<input id="editName" value="${escapeAttr(profile.name || "")}" disabled></label>
+        <div class="pair">
+          <label>平台<select id="editPlatform">${platformOptions(commerce.platform)}</select></label>
+          <label>市场<input id="editMarket" value="${escapeAttr(commerce.market || "US")}"></label>
+        </div>
+        <div class="pair">
+          <label>品牌<input id="editBrand" value="${escapeAttr(commerce.brand || "")}"></label>
+          <label>负责人<input id="editOwner" value="${escapeAttr(commerce.owner || "")}"></label>
+        </div>
+        <div class="pair">
+          <label>账号状态<select id="editStatus">${accountOptions(commerce.account_status)}</select></label>
+          <label>优先级<select id="editPriority">${priorityOptions(commerce.priority)}</select></label>
+        </div>
+        <label>今日目标<input id="editGoal" value="${escapeAttr(commerce.daily_goal || "")}" placeholder="如：上架 3 个商品 / 检查订单"></label>
+        <label>备注<textarea id="editNotes">${escapeHtml(commerce.notes || "")}</textarea></label>
+      `;
+    }
+
+    function renderEvents() {
+      $("events").innerHTML = state.events.length ? state.events.slice(0, 10).map((event) => `
+        <div class="event">
+          <strong>${escapeHtml(event.category)}</strong> ${escapeHtml(event.message)}
+          <small>${formatTime(event.ts)}${event.profile_id ? " · " + escapeHtml(shortId(event.profile_id)) : ""}</small>
+        </div>
+      `).join("") : '<div class="muted">暂无事件</div>';
+    }
+
+    async function refresh({ quiet = false } = {}) {
+      if (state.inputFocused && quiet) return;
+      const [stats, profiles, events, tasks] = await Promise.all([
+        api("/api/stats"),
+        api("/api/profiles"),
+        api("/api/events"),
+        api("/api/commerce/tasks"),
+      ]);
+      state.profiles = profiles;
+      state.events = events;
+      state.tasks = tasks;
+      $("maxLaunches").textContent = stats.max_concurrent_launches;
+      $("lastUpdated").textContent = `最后同步 ${new Date().toLocaleTimeString()}`;
+      renderAll();
+      if (!quiet) toast("已刷新");
+    }
+
+    async function runProfileAction(profileId, action, row, taskId = "") {
+      const url = row?.querySelector('[data-role="url"]')?.value?.trim();
+      setBusy(profileId, true);
+      try {
+        let result;
+        if (action === "launch") result = await api(`/api/profiles/${profileId}/launch`, { method: "POST", body: JSON.stringify({ start_url: url }) });
+        if (action === "stop") result = await api(`/api/profiles/${profileId}/stop`, { method: "POST" });
+        if (action === "go") result = await api(`/api/profiles/${profileId}/navigate`, { method: "POST", body: JSON.stringify({ url }) });
+        if (action === "proxy") result = await api(`/api/profiles/${profileId}/proxy-check`, { method: "POST" });
+        if (action === "pages") result = await api(`/api/profiles/${profileId}/pages`);
+        if (action === "shot") result = await api(`/api/profiles/${profileId}/screenshot`, { method: "POST" });
+        if (action === "logs") result = await fetch(`/api/profiles/${profileId}/logs`).then((res) => res.text());
+        if (action === "task") result = await api(`/api/profiles/${profileId}/task`, { method: "POST", body: JSON.stringify({ task_id: taskId }) });
+        await refresh({ quiet: true });
+        showResult(`${profileName(profileId)} / ${actionLabel(action, taskId)}`, result);
+        toast(`${actionLabel(action, taskId)}完成`);
+      } catch (error) {
+        const message = String(error.message || error);
+        showResult(`${profileName(profileId)} / 错误`, message);
+        toast(message, "error");
+      } finally {
+        setBusy(profileId, false);
+      }
+    }
+
+    async function runBatch(action) {
+      const ids = [...state.selected];
+      if (!ids.length) return toast("先选择店铺档案", "error");
+      try {
+        const result = await api("/api/profiles/batch", { method: "POST", body: JSON.stringify({ ids, action }) });
+        await refresh({ quiet: true });
+        showResult(`批量${actionLabel(action)}`, result);
+        toast(`批量${actionLabel(action)}完成`);
+      } catch (error) {
+        toast(String(error.message || error), "error");
+      }
+    }
+
+    async function saveCommerce() {
+      if (!state.activeProfileId) return toast("先选择一行", "error");
+      const body = {
+        platform: $("editPlatform").value,
+        market: $("editMarket").value.trim().toUpperCase(),
+        brand: $("editBrand").value.trim(),
+        owner: $("editOwner").value.trim(),
+        account_status: $("editStatus").value,
+        priority: $("editPriority").value,
+        daily_goal: $("editGoal").value.trim(),
+        notes: $("editNotes").value.trim(),
+      };
+      const result = await api(`/api/profiles/${state.activeProfileId}/commerce`, { method: "PATCH", body: JSON.stringify(body) });
+      await refresh({ quiet: true });
+      showResult(`${profileName(state.activeProfileId)} / 运营字段`, result);
+      toast("运营字段已保存");
+    }
+
+    function setBusy(profileId, busy) {
+      busy ? state.busy.add(profileId) : state.busy.delete(profileId);
+      renderRows();
+    }
+
+    function showResult(title, result) {
+      $("outputTitle").textContent = title;
+      $("outputBox").textContent = typeof result === "string" ? result : JSON.stringify(result, null, 2);
+    }
+
+    function actionLabel(action, taskId = "") {
+      const labels = { launch: "启动", stop: "停止", proxy: "检测代理", pages: "页面", shot: "截图", logs: "日志", go: "访问", task: taskName(taskId) };
+      return labels[action] || action;
+    }
+
+    function taskName(taskId) {
+      for (const group of state.tasks) {
+        const task = (group.tasks || []).find((item) => item.id === taskId);
+        if (task) return task.label;
+      }
+      return "任务";
+    }
+
+    function proxyLabel(profile) {
+      const proxy = profile.proxy || {};
+      if (proxy.mode === "direct") return "Direct";
+      return proxy.display || `${proxy.protocol || "proxy"}://${proxy.host || ""}:${proxy.port || ""}`;
+    }
+
+    function fillSelect(id, allLabel, options, value) {
+      const select = $(id);
+      const current = value || "all";
+      select.innerHTML = [`<option value="all">${allLabel}</option>`, ...options.map(([v, label]) => `<option value="${escapeAttr(v)}">${escapeHtml(label)}</option>`)].join("");
+      select.value = current;
+    }
+
+    function platformOptions(value) {
+      const values = ["tiktok_shop", "amazon", "shopify", "etsy", "ebay", "social"];
+      return values.map((item) => `<option value="${item}" ${item === value ? "selected" : ""}>${platformName(item)}</option>`).join("");
+    }
+
+    function accountOptions(value) {
+      return Object.entries(accountLabels).map(([key, label]) => `<option value="${key}" ${key === value ? "selected" : ""}>${label}</option>`).join("");
+    }
+
+    function priorityOptions(value) {
+      const map = { low: "低", normal: "普通", high: "高" };
+      return Object.entries(map).map(([key, label]) => `<option value="${key}" ${key === value ? "selected" : ""}>${label}</option>`).join("");
+    }
+
+    function platformName(value) {
+      return platformLabels[value] || value || "-";
+    }
+
+    function unique(values) {
+      return [...new Set(values.filter(Boolean))].sort();
+    }
+
+    function profileName(profileId) {
+      return state.profiles.find((profile) => profile.id === profileId)?.name || shortId(profileId);
+    }
+
+    function shortId(value) {
+      return String(value || "").slice(0, 8);
+    }
+
+    function formatTime(value) {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? value || "" : date.toLocaleString();
+    }
+
+    function toast(message, type = "info") {
+      const item = document.createElement("div");
+      item.className = `toast-item ${type === "error" ? "error" : ""}`;
+      item.textContent = message;
+      $("toast").appendChild(item);
+      setTimeout(() => item.remove(), 3200);
+    }
+
+    $("profileRows").addEventListener("click", (event) => {
+      const row = event.target.closest("tr[data-id]");
+      if (!row) return;
+      const profileId = row.dataset.id;
+      const checkbox = event.target.closest('[data-role="select"]');
+      if (checkbox) {
+        checkbox.checked ? state.selected.add(profileId) : state.selected.delete(profileId);
+        renderRows();
+        return;
+      }
+      state.activeProfileId = profileId;
+      const button = event.target.closest("button");
+      if (button) {
+        runProfileAction(profileId, button.dataset.action, row, button.dataset.taskId || "");
+      }
+      renderRows();
+      renderEditor();
+    });
+
+    $("profileRows").addEventListener("focusin", (event) => {
+      if (event.target.matches("input, select, textarea")) state.inputFocused = true;
+    });
+    $("profileRows").addEventListener("focusout", (event) => {
+      if (event.target.matches("input, select, textarea")) state.inputFocused = false;
+    });
+    $("commerceEditor").addEventListener("focusin", (event) => {
+      if (event.target.matches("input, select, textarea")) state.inputFocused = true;
+    });
+    $("commerceEditor").addEventListener("focusout", (event) => {
+      if (event.target.matches("input, select, textarea")) state.inputFocused = false;
+    });
+    $("profileRows").addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      const input = event.target.closest('[data-role="url"]');
+      if (!input) return;
+      const row = event.target.closest("tr[data-id]");
+      const profile = state.profiles.find((item) => item.id === row.dataset.id);
+      if (profile?.status === "running") runProfileAction(row.dataset.id, "go", row);
+    });
+
+    $("selectAll").addEventListener("change", (event) => {
+      for (const profile of filteredProfiles()) {
+        event.target.checked ? state.selected.add(profile.id) : state.selected.delete(profile.id);
+      }
+      renderRows();
+    });
+    document.querySelector(".batchbar").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-batch]");
+      if (button) runBatch(button.dataset.batch);
+    });
+    $("saveCommerceBtn").addEventListener("click", saveCommerce);
+    $("importFleetBtn").addEventListener("click", async () => {
+      const result = await api("/api/import/camoufox-fleet", {
+        method: "POST",
+        body: JSON.stringify({
+          source_dir: $("fleetPathInput").value,
+          copy_browser_data: true,
+          overwrite_browser_data: $("overwriteBrowserData").checked,
+          include_cache: false
+        })
+      });
+      await refresh({ quiet: true });
+      showResult("导入 Camoufox DB", result);
+      toast(`已导入 ${result.count} 个档案`);
+    });
+    $("exportBtn").addEventListener("click", () => {
+      window.location.href = "/api/export/archive?include_browser_data=true&include_logs=false&include_screenshots=false&include_cache=false";
+    });
+    $("refreshBtn").addEventListener("click", () => refresh());
+    $("clearOutput").addEventListener("click", () => {
+      $("outputTitle").textContent = "操作结果";
+      $("outputBox").textContent = "任务结果、代理检测和日志会显示在这里。";
+    });
+    $("searchInput").addEventListener("input", (event) => {
+      state.query = event.target.value;
+      renderRows();
+    });
+    for (const id of ["statusFilter", "platformFilter", "marketFilter", "healthFilter"]) {
+      $(id).addEventListener("change", (event) => {
+        const key = id.replace("Filter", "");
+        state[key] = event.target.value;
+        renderRows();
+      });
+    }
+    $("autoBtn").addEventListener("click", () => {
+      state.auto = !state.auto;
+      $("autoBtn").setAttribute("aria-pressed", String(state.auto));
+      $("autoBtn").textContent = state.auto ? "自动刷新" : "暂停刷新";
+      toast(state.auto ? "自动刷新已开启" : "自动刷新已暂停");
+    });
+    $("quickTasks").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-quick-task]");
+      if (!button) return;
+      const ids = [...state.selected];
+      if (!ids.length) return toast("先选择店铺档案", "error");
+      api("/api/profiles/batch", { method: "POST", body: JSON.stringify({ ids, action: "task", task_id: button.dataset.quickTask }) })
+        .then((result) => refresh({ quiet: true }).then(() => showResult(`批量${taskName(button.dataset.quickTask)}`, result)))
+        .catch((error) => toast(String(error.message || error), "error"));
+    });
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/`/g, "&#96;");
+    }
+
+    refresh({ quiet: true });
+    setInterval(() => {
+      if (state.auto) refresh({ quiet: true });
+    }, 5000);
+  </script>
+</body>
+</html>

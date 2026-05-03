@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="220" fill="none" viewBox="0 0 1040 220" role="img" aria-labelledby="title desc">
+  <title id="title">Jien Browser Fleet</title>
+  <desc id="desc">Logo lockup for Jien Browser Fleet, a local browser environment fleet manager.</desc>
+  <rect width="1040" height="220" rx="36" fill="#ffffff"/>
+  <rect width="132" height="132" x="54" y="44" rx="32" fill="#176b5b"/>
+  <path fill="#d9f4e8" d="m120 57-39 15v31c0 26 16 44 39 55 23-11 39-29 39-55V72z"/>
+  <path fill="#121820" d="m120 65-31 12v25c0 21 12 36 31 45 19-9 31-24 31-45V77z"/>
+  <rect width="54" height="40" x="92" y="86" fill="#f8fafc" rx="9"/>
+  <path fill="#dbe5ee" d="M92 96c0-6 4-10 10-10h34c6 0 10 4 10 10v4H92z"/>
+  <circle cx="103" cy="94" r="2.5" fill="#176b5b"/>
+  <circle cx="111" cy="94" r="2.5" fill="#59d6b0"/>
+  <path stroke="#121820" stroke-linecap="round" stroke-linejoin="round" stroke-width="7" d="M126 104v12c0 9-5 15-15 15"/>
+  <path stroke="#59d6b0" stroke-linecap="round" stroke-linejoin="round" stroke-width="6" d="M104 114c10-10 23-10 32 0"/>
+  <circle cx="104" cy="114" r="5" fill="#59d6b0" stroke="#f8fafc" stroke-width="3"/>
+  <circle cx="136" cy="114" r="5" fill="#59d6b0" stroke="#f8fafc" stroke-width="3"/>
+  <text x="220" y="102" fill="#121820" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="52" font-weight="800" letter-spacing="0">Jien Browser Fleet</text>
+  <text x="222" y="142" fill="#647184" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="25" font-weight="600" letter-spacing="0">极恩跨境指纹浏览器 · Local-first ecommerce browser environments</text>
+  <rect width="182" height="36" x="221" y="158" rx="18" fill="#e7f4ef"/>
+  <text x="246" y="182" fill="#176b5b" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="16" font-weight="700" letter-spacing="0">Camoufox Core</text>
+  <rect width="144" height="36" x="416" y="158" rx="18" fill="#eef2f6"/>
+  <text x="442" y="182" fill="#475569" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="16" font-weight="700" letter-spacing="0">FastAPI</text>
+  <rect width="150" height="36" x="574" y="158" rx="18" fill="#eef2f6"/>
+  <text x="600" y="182" fill="#475569" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="16" font-weight="700" letter-spacing="0">React UI</text>
+</svg>
