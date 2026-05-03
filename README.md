@@ -287,6 +287,57 @@ Double-check before making it public:
 - Optional encrypted local secret store for proxy credentials.
 - Release packaging with a signed macOS app wrapper.
 
+## Support This Project
+
+If Jien Browser Fleet helps your work, research, or operations, you are welcome to support ongoing maintenance and future improvements.
+
+> Sponsorship or donation does not grant commercial rights, trademark rights, redistribution rights, or a commercial license.
+
+<table>
+  <tr>
+    <td align="center">
+      <strong>微信赞赏</strong>
+      <br />
+      <img src="./docs/community/wechat-donate.png" alt="WeChat Pay donation QR code" width="220" />
+    </td>
+    <td align="center">
+      <strong>支付宝赞赏</strong>
+      <br />
+      <img src="./docs/community/alipay-donate.jpg" alt="Alipay donation QR code" width="220" />
+    </td>
+  </tr>
+</table>
+
+More details: [`SUPPORT.md`](./SUPPORT.md)
+
+## Community And Contact
+
+欢迎跨境卖家、AI 产品开发者、独立开发者，以及对 AI 出海产品感兴趣的朋友加入交流群。适合聊：
+
+- 跨境和出海场景下的 AI 产品开发
+- 指纹浏览器、自动化、账号环境和运营工作流
+- 增长、获客、内容、设计和产品化经验
+- 开发、运营和商业化实践
+
+<table>
+  <tr>
+    <td align="center">
+      <strong>企业微信交流群</strong>
+      <br />
+      <img src="./docs/community/community-wecom.jpg" alt="Enterprise WeCom group QR code" width="220" />
+    </td>
+    <td align="center">
+      <strong>个人微信联系</strong>
+      <br />
+      <img src="./docs/community/personal-wechat-contact.png" alt="Personal WeChat contact QR code" width="220" />
+    </td>
+  </tr>
+</table>
+
+If you add Giien Global on WeChat, please include a short note such as `仓库反馈`, `合作沟通`, `商用授权`, or `产品交流`.
+
+Community details: [`COMMUNITY.md`](./COMMUNITY.md)
+
 ## Security Notes
 
 Jien Browser Fleet is local-first, but local does not mean risk-free:
