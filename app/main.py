@@ -53,6 +53,7 @@ class ProfileBody(BaseModel):
     tags: list[str] = []
     start_url: str = settings.default_start_url
     proxy: dict[str, Any] = {"mode": "direct", "display": "Direct"}
+    commerce: dict[str, Any] = {}
     fingerprint: dict[str, Any] = {
         "timezone": "America/Los_Angeles",
         "locale": "en-US",

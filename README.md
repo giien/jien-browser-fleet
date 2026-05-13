@@ -37,7 +37,7 @@ Jien Browser Fleet is a local browser environment manager built for cross-border
 | Area | Capability |
 | --- | --- |
 | Browser core | Launches isolated Camoufox profiles with persistent browser data. |
-| Account matrix | Stores platform, brand, market, owner, priority, account status, goals, and notes. |
+| Account matrix | Creates profiles and stores platform, brand, market, owner, priority, account status, goals, and notes. |
 | Proxy health | Checks proxy IP, country, city, organization, and timezone alignment. |
 | Deep environment checks | Reads browser timezone, language, platform, user agent, WebDriver flag, screen and viewport. |
 | Ecommerce tasks | Provides quick task templates such as Seller Center, orders, products, ads, creators, Instagram, mail, and IP checks. |

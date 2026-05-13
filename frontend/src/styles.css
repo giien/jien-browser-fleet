@@ -280,6 +280,29 @@ textarea:disabled {
   justify-content: flex-end;
 }
 
+.create-panel {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgba(25, 35, 49, 0.04);
+  overflow: hidden;
+}
+
+.create-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.create-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+
 .path-input {
   flex: 1 1 310px;
   min-width: min(360px, 100%);
@@ -1307,6 +1330,10 @@ input[type="checkbox"] {
     grid-template-columns: 1fr;
   }
 
+  .create-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .data-ops-controls {
     justify-content: flex-start;
   }
@@ -1342,9 +1369,18 @@ input[type="checkbox"] {
   }
 
   .metric-grid,
+  .create-grid,
   .editor-grid,
   .nav-list {
     grid-template-columns: 1fr;
+  }
+
+  .create-actions {
+    flex-direction: column;
+  }
+
+  .create-actions .btn {
+    width: 100%;
   }
 
   .command-strip {

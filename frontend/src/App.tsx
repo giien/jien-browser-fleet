@@ -17,6 +17,7 @@ import {
   Package,
   PanelRight,
   Play,
+  Plus,
   RefreshCw,
   Search,
   ShieldCheck,
@@ -24,6 +25,7 @@ import {
   Square,
   Store,
   Users,
+  X,
 } from "lucide-react";
 import { Badge, Button, EmptyState, Field } from "./components/ui";
 import { cn } from "./lib/utils";
@@ -160,6 +162,25 @@ type EventItem = {
 
 type SectionKey = "accounts" | "health" | "tasks" | "logs";
 
+type NewProfileDraft = {
+  name: string;
+  platform: string;
+  market: string;
+  brand: string;
+  owner: string;
+  start_url: string;
+  tags: string;
+  proxy_mode: "direct" | "socks5" | "http";
+  proxy_host: string;
+  proxy_port: string;
+  proxy_username: string;
+  proxy_password: string;
+  timezone: string;
+  locale: string;
+  screen_width: string;
+  screen_height: string;
+};
+
 const DEFAULT_STATS: Stats = {
   profiles_total: 0,
   profiles_running: 0,
@@ -183,6 +204,24 @@ const MARKET_OPTIONS = ["US", "UK", "CA", "AU", "DE", "FR", "IT", "ES", "JP", "K
 const STATUS_OPTIONS = ["normal", "verify", "limited", "suspended"];
 const PRIORITY_OPTIONS = ["low", "normal", "high", "urgent"];
 const DEFAULT_CAMOUFOX_IMPORT_PATH = "/Volumes/Rtl9210/camoufox-fleet-local";
+const DEFAULT_NEW_PROFILE: NewProfileDraft = {
+  name: "",
+  platform: "tiktok_shop",
+  market: "US",
+  brand: "",
+  owner: "",
+  start_url: "https://ipwho.is/",
+  tags: "",
+  proxy_mode: "direct",
+  proxy_host: "",
+  proxy_port: "",
+  proxy_username: "",
+  proxy_password: "",
+  timezone: "America/New_York",
+  locale: "en-US",
+  screen_width: "1440",
+  screen_height: "900",
+};
 const NAV_ITEMS: Array<{ key: SectionKey; label: string; icon: typeof Store }> = [
   { key: "accounts", label: "账号矩阵", icon: Layers3 },
   { key: "health", label: "代理健康", icon: ShieldCheck },
@@ -230,6 +269,15 @@ function compactId(value?: string | null) {
   return `${value.slice(0, 8)}...${value.slice(-4)}`;
 }
 
+function profileSlug(value: string) {
+  const normalized = value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return normalized || "profile";
+}
+
 function stringifyResult(value: unknown) {
   if (typeof value === "string") return value;
   return JSON.stringify(value, null, 2);
@@ -271,6 +319,8 @@ export default function App() {
   const [camoufoxImportPath, setCamoufoxImportPath] = useState(DEFAULT_CAMOUFOX_IMPORT_PATH);
   const [copyBrowserData, setCopyBrowserData] = useState(true);
   const [overwriteBrowserData, setOverwriteBrowserData] = useState(false);
+  const [showCreatePanel, setShowCreatePanel] = useState(false);
+  const [newProfile, setNewProfile] = useState<NewProfileDraft>(DEFAULT_NEW_PROFILE);
 
   const activeProfile = useMemo(
     () => profiles.find((profile) => profile.id === activeId) || profiles[0],
@@ -427,6 +477,77 @@ export default function App() {
         body: JSON.stringify({ ids, action }),
       }),
     );
+  }
+
+  async function createProfile() {
+    const name = newProfile.name.trim();
+    if (!name) {
+      setOutput("创建失败\n请先填写环境名称。");
+      return;
+    }
+    if (newProfile.proxy_mode !== "direct" && (!newProfile.proxy_host.trim() || !newProfile.proxy_port.trim())) {
+      setOutput("创建失败\n代理模式为 SOCKS5/HTTP 时，必须填写代理主机和端口。");
+      return;
+    }
+    const id = `${profileSlug(`${newProfile.brand || name}-${newProfile.platform}-${newProfile.market}`)}-${Date.now().toString(36)}`;
+    const tags = newProfile.tags
+      .split(/[,\s，]+/)
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+    const proxy =
+      newProfile.proxy_mode === "direct"
+        ? { mode: "direct", display: "Direct" }
+        : {
+            mode: "proxy",
+            protocol: newProfile.proxy_mode,
+            host: newProfile.proxy_host.trim(),
+            port: Number(newProfile.proxy_port) || 0,
+            username: newProfile.proxy_username.trim(),
+            password: newProfile.proxy_password,
+            display: `${newProfile.proxy_mode}://${newProfile.proxy_host.trim()}:${newProfile.proxy_port.trim()}`,
+          };
+    setBusyKey(`create:${id}`);
+    try {
+      const result = await apiJson("/api/profiles", {
+        method: "POST",
+        body: JSON.stringify({
+          id,
+          name,
+          source: "manual",
+          tags,
+          start_url: newProfile.start_url.trim() || "https://ipwho.is/",
+          proxy,
+          fingerprint: {
+            timezone: newProfile.timezone.trim() || "America/New_York",
+            locale: newProfile.locale.trim() || "en-US",
+            platform: "MacIntel",
+            screen: {
+              width: Number(newProfile.screen_width) || 1440,
+              height: Number(newProfile.screen_height) || 900,
+            },
+          },
+          commerce: {
+            platform: newProfile.platform,
+            market: newProfile.market,
+            brand: newProfile.brand.trim(),
+            owner: newProfile.owner.trim(),
+            account_status: "normal",
+            priority: "normal",
+          },
+        }),
+      });
+      setOutput(stringifyResult(result));
+      await refreshData({ quiet: true });
+      setActiveId(id);
+      setSelectedIds([id]);
+      setActiveSection("accounts");
+      setShowCreatePanel(false);
+      setNewProfile(DEFAULT_NEW_PROFILE);
+    } catch (error) {
+      setOutput(`创建失败\n${String(error)}`);
+    } finally {
+      setBusyKey("");
+    }
   }
 
   async function saveCommerce() {
@@ -590,6 +711,10 @@ export default function App() {
             <h1>极恩跨境指纹浏览器</h1>
           </div>
           <div className="top-actions">
+            <Button variant="secondary" onClick={() => setShowCreatePanel((value) => !value)}>
+              {showCreatePanel ? <X size={16} /> : <Plus size={16} />}
+              {showCreatePanel ? "关闭新建" : "新建环境"}
+            </Button>
             <Button variant={autoRefresh ? "quiet" : "secondary"} onClick={() => setAutoRefresh((value) => !value)}>
               <RefreshCw size={16} className={cn(autoRefresh && "spin-slow")} />
               {autoRefresh ? "自动刷新" : "手动刷新"}
@@ -641,6 +766,183 @@ export default function App() {
             </Button>
           </div>
         </section>
+
+        {showCreatePanel && (
+          <section className="create-panel">
+            <div className="panel-title compact">
+              <div>
+                <strong>新建账号环境</strong>
+                <span>创建后默认停止，可在账号矩阵中启动、检测代理或补充运营字段。</span>
+              </div>
+              <Badge tone="muted">Manual</Badge>
+            </div>
+            <div className="create-grid">
+              <Field label="环境名称">
+                <input
+                  value={newProfile.name}
+                  placeholder="例如：icrayon-tiktok-02"
+                  onChange={(event) => setNewProfile((current) => ({ ...current, name: event.target.value }))}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                />
+              </Field>
+              <Field label="平台">
+                <select
+                  value={newProfile.platform}
+                  onChange={(event) => setNewProfile((current) => ({ ...current, platform: event.target.value }))}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                >
+                  {["tiktok_shop", "amazon", "shopify", "social", "etsy", "ebay", "utility"].map((platform) => (
+                    <option key={platform} value={platform}>{platformLabel(platform)}</option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="市场">
+                <select
+                  value={newProfile.market}
+                  onChange={(event) => setNewProfile((current) => ({ ...current, market: event.target.value }))}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                >
+                  {MARKET_OPTIONS.map((market) => <option key={market}>{market}</option>)}
+                </select>
+              </Field>
+              <Field label="品牌">
+                <input
+                  value={newProfile.brand}
+                  placeholder="品牌或店铺名"
+                  onChange={(event) => setNewProfile((current) => ({ ...current, brand: event.target.value }))}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                />
+              </Field>
+              <Field label="负责人">
+                <input
+                  value={newProfile.owner}
+                  placeholder="未分配"
+                  onChange={(event) => setNewProfile((current) => ({ ...current, owner: event.target.value }))}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                />
+              </Field>
+              <Field label="默认入口">
+                <input
+                  value={newProfile.start_url}
+                  placeholder="https://ipwho.is/"
+                  onChange={(event) => setNewProfile((current) => ({ ...current, start_url: event.target.value }))}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                />
+              </Field>
+              <Field label="标签">
+                <input
+                  value={newProfile.tags}
+                  placeholder="tiktok, us, new"
+                  onChange={(event) => setNewProfile((current) => ({ ...current, tags: event.target.value }))}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                />
+              </Field>
+              <Field label="代理模式">
+                <select
+                  value={newProfile.proxy_mode}
+                  onChange={(event) => setNewProfile((current) => ({ ...current, proxy_mode: event.target.value as NewProfileDraft["proxy_mode"] }))}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                >
+                  <option value="direct">Direct</option>
+                  <option value="socks5">SOCKS5</option>
+                  <option value="http">HTTP</option>
+                </select>
+              </Field>
+              {newProfile.proxy_mode !== "direct" && (
+                <>
+                  <Field label="代理主机">
+                    <input
+                      value={newProfile.proxy_host}
+                      placeholder="127.0.0.1"
+                      onChange={(event) => setNewProfile((current) => ({ ...current, proxy_host: event.target.value }))}
+                      onFocus={() => setInputFocused(true)}
+                      onBlur={() => setInputFocused(false)}
+                    />
+                  </Field>
+                  <Field label="代理端口">
+                    <input
+                      value={newProfile.proxy_port}
+                      placeholder="12324"
+                      onChange={(event) => setNewProfile((current) => ({ ...current, proxy_port: event.target.value.replace(/\D/g, "") }))}
+                      onFocus={() => setInputFocused(true)}
+                      onBlur={() => setInputFocused(false)}
+                    />
+                  </Field>
+                  <Field label="代理账号">
+                    <input
+                      value={newProfile.proxy_username}
+                      placeholder="可选"
+                      onChange={(event) => setNewProfile((current) => ({ ...current, proxy_username: event.target.value }))}
+                      onFocus={() => setInputFocused(true)}
+                      onBlur={() => setInputFocused(false)}
+                    />
+                  </Field>
+                  <Field label="代理密码">
+                    <input
+                      type="password"
+                      value={newProfile.proxy_password}
+                      placeholder="可选"
+                      onChange={(event) => setNewProfile((current) => ({ ...current, proxy_password: event.target.value }))}
+                      onFocus={() => setInputFocused(true)}
+                      onBlur={() => setInputFocused(false)}
+                    />
+                  </Field>
+                </>
+              )}
+              <Field label="时区">
+                <input
+                  value={newProfile.timezone}
+                  placeholder="America/New_York"
+                  onChange={(event) => setNewProfile((current) => ({ ...current, timezone: event.target.value }))}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                />
+              </Field>
+              <Field label="语言">
+                <input
+                  value={newProfile.locale}
+                  placeholder="en-US"
+                  onChange={(event) => setNewProfile((current) => ({ ...current, locale: event.target.value }))}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                />
+              </Field>
+              <Field label="屏幕宽度">
+                <input
+                  value={newProfile.screen_width}
+                  onChange={(event) => setNewProfile((current) => ({ ...current, screen_width: event.target.value.replace(/\D/g, "") }))}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                />
+              </Field>
+              <Field label="屏幕高度">
+                <input
+                  value={newProfile.screen_height}
+                  onChange={(event) => setNewProfile((current) => ({ ...current, screen_height: event.target.value.replace(/\D/g, "") }))}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setInputFocused(false)}
+                />
+              </Field>
+            </div>
+            <div className="create-actions">
+              <Button variant="secondary" onClick={() => setNewProfile(DEFAULT_NEW_PROFILE)} disabled={Boolean(busyKey)}>
+                重置
+              </Button>
+              <Button variant="primary" onClick={() => void createProfile()} disabled={Boolean(busyKey) || !newProfile.name.trim()}>
+                <Plus size={16} />
+                创建环境
+              </Button>
+            </div>
+          </section>
+        )}
 
         <section className="metric-grid" aria-label="账号概览">
           <Metric icon={Store} label="账号总数" value={stats.profiles_total} detail="账号环境已入库" />
